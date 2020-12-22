@@ -5,7 +5,6 @@ dependencies:
   - python=3.7
   - numpy
   - pandas
-  - pandas
   - geopandas
   - pip
   - pip:
