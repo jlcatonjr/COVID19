@@ -1,0 +1,17 @@
+name: COVID19-environment
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - numpy
+  - pandas
+  - geopandas
+  - pip
+  - pip:
+    - nbgitpuller
+    - sphinx-gallery
+    - pandas
+    - matplotlib
+    - ipywidgets
+    - mpl_toolkits
+    - voila
