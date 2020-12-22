@@ -5,13 +5,10 @@ dependencies:
   - python=3.7
   - numpy
   - pandas
+  - pandas
   - geopandas
   - pip
   - pip:
-    - nbgitpuller
-    - sphinx-gallery
-    - pandas
     - matplotlib
     - ipywidgets
-    - mpl_toolkits
     - voila
