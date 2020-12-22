@@ -13,3 +13,7 @@ dependencies:
     - ipywidgets
     - voila
     - pyarrow
+    - descartes
+    - GDAL
+    - fiona
+    - shapely
