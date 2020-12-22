@@ -6,6 +6,7 @@ dependencies:
   - numpy
   - pandas
   - geopandas
+  - statsmodels
   - pip
   - pip:
     - matplotlib
