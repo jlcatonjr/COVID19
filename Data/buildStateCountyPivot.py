@@ -1,11 +1,30 @@
 import pandas as pd
 import geopandas as gpd
+import geoparquet as gpq
 import numpy as np
 import pyarrow as pa
 
 def write_to_parquet(df, filename):
     table = pa.Table.from_pandas(df)
     pa.parquet.write_table(table, filename)
+
+def import_geo_data(filename, index_col = "Date", FIPS_name = "FIPS"):
+    # import county level shapefile
+    map_data = gpd.read_file(filename = filename,                                   
+                                   index_col = index_col)
+    # rename fips code to match variable name in COVID-19 data
+    map_data.rename(columns={"State":"state"},
+                    inplace = True)
+    # Combine statefips and county fips to create a single fips value
+    # that identifies each particular county without referencing the 
+    # state separately
+    map_data[FIPS_name] = map_data["STATEFP"].astype(str) + \
+        map_data["COUNTYFP"].astype(str)
+    map_data[FIPS_name] = map_data[FIPS_name].astype(np.int64)
+    # set FIPS as index
+    map_data.set_index(FIPS_name, inplace=True)
+    
+    return map_data
 
 covid_data =pd.read_parquet("../COVID19DataForVoila.parquet.gzip")
 state_dict = {
@@ -63,7 +82,17 @@ covid_data = pd.pivot_table(covid_data.reset_index(),
                       "Total Cases", "Total Deaths"], 
                index=['fips_code'], columns=['date'])
     
+map_data = import_geo_data(filename = "countiesWithStatesAndPopulation.shp",
+    index_col = "date", FIPS_name= "fips_code")
+counties = covid_data.index
+covid_map_data= map_data.loc[counties]
+for key, val in covid_data.items():
+    covid_map_data[key] = val.astype(np.float64)
+# transform tuple keys to string for saving, then transform back when imported
+covid_map_data.rename(columns={col:str(col) for col in covid_map_data.keys()}, 
+                      inplace = True)
 
 
 write_to_parquet(state_df_pivot, "../COVID19StatePivot.parquet.gzip")
 write_to_parquet(covid_data, "../COVID19CovidDataPivot.parquet.gzip")
+# covid_map_data.to_file("../COVID19MapData.shp")
